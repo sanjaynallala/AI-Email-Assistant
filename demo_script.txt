@@ -1,0 +1,42 @@
+Hello, my name is Nallala Sanjay, and I am presenting my project: 
+AI-Powered Communication Assistant for managing customer support emails.
+
+This assistant was built to automatically filter, analyze, and generate 
+responses to customer emails, helping support teams save time and improve 
+customer satisfaction.
+
+Step 1: Email Retrieval and Filtering
+- The system retrieves emails from a dataset or directly from email accounts.
+- It filters subjects containing words like "Support", "Query", "Request", or "Help".
+- On the dashboard, we can see sender, subject, body, and date for all filtered emails.
+
+Step 2: Categorization and Prioritization
+- Each email is analyzed for sentiment (Positive, Neutral, or Negative).
+- Priority is assigned based on urgency keywords such as "urgent", "critical", or "immediately".
+- Urgent emails are pushed to the top of the processing queue.
+
+Step 3: Context-Aware Auto-Responses
+- The system generates professional draft replies.
+- Replies adapt based on sentiment and urgency. For example:
+   - Negative emails get empathetic responses.
+   - Urgent emails get quick acknowledgments and priority actions.
+- Drafts are editable before sending.
+
+Step 4: Information Extraction
+- The system extracts contact information such as phone numbers or alternate emails.
+- It also identifies product or feature references mentioned in the email.
+- This extra metadata helps support teams act faster.
+
+Step 5: Dashboard and Analytics
+- The Streamlit dashboard displays:
+   - All filtered support emails
+   - Sentiment and priority statistics (shown in charts)
+   - Metrics like emails received in the last 24 hours, resolved vs pending
+- Users can mark emails as resolved directly from the dashboard.
+
+Impact:
+- This project reduces manual effort, ensures faster and empathetic responses,
+  and improves customer satisfaction.
+
+Thank you for watching this demo. 
+The full code, dataset, and instructions are available in the GitHub repository.
