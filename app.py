@@ -1,54 +1,29 @@
 import streamlit as st
-import pandas as pd
-import plotly.express as px
-from models import analyze_email, generate_response
-from utils import extract_info
+from datetime import datetime, timedelta
+# assume result_df exists and has Date column parsed as datetime and a 'Priority' column
 
-# Load dataset
-df = pd.read_csv("Sample_Support_Emails_Dataset.csv")
+# Convert Date column to datetime if not already
+result_df['Date'] = pd.to_datetime(result_df['Date'], errors='coerce')
 
-st.set_page_config(page_title="AI Email Assistant", layout="wide")
-st.title("📧 AI-Powered Communication Assistant")
-st.write("Filter, analyze, and auto-respond to customer support emails")
+# Simple resolved/pending toggles (in this demo it's manual toggling)
+st.subheader("Status")
+# initialize session state for statuses
+if 'statuses' not in st.session_state:
+    st.session_state['statuses'] = {i: "Pending" for i in result_df.index}
 
-# Keywords for filtering
-keywords = ["support", "query", "request", "help"]
-df_filtered = df[df["subject"].str.contains("|".join(keywords), case=False, na=False)]
-
-# Analyze emails
-analysis = []
-for _, row in df_filtered.iterrows():
-    sentiment, priority = analyze_email(str(row["body"]))
-    response = generate_response(str(row["body"]), sentiment, priority)
-    info = extract_info(str(row["body"]))
-    analysis.append({
-        "Sender": row["sender"],
-        "Subject": row["subject"],
-        "Body": row["body"][:80] + "...",  # shorten for display
-        "Date": row["sent_date"],
-        "Sentiment": sentiment,
-        "Priority": priority,
-        "Extracted Info": info,
-        "Response": response
-    })
-
-result_df = pd.DataFrame(analysis)
-
-# Display table
-st.subheader("📋 Filtered & Analyzed Emails")
-st.dataframe(result_df[["Sender", "Subject", "Sentiment", "Priority"]])
-
-# Charts
-col1, col2 = st.columns(2)
-with col1:
-    fig_sentiment = px.pie(result_df, names="Sentiment", title="Sentiment Distribution")
-    st.plotly_chart(fig_sentiment, use_container_width=True)
-with col2:
-    fig_priority = px.bar(result_df, x="Priority", title="Priority Counts")
-    st.plotly_chart(fig_priority, use_container_width=True)
-
-# Responses
-st.subheader("🤖 AI Draft Responses")
 for i, row in result_df.iterrows():
-    st.write(f"**From:** {row['Sender']} | **Subject:** {row['Subject']}")
-    st.text_area("Draft Reply", row["Response"], key=f"resp_{i}")
+    cols = st.columns([3,1,1])
+    cols[0].write(f"**{row['Subject']}** from {row['Sender']}")
+    cols[1].write(st.session_state['statuses'].get(i))
+    if cols[2].button("Mark Resolved", key=f"res_{i}"):
+        st.session_state['statuses'][i] = "Resolved"
+
+# Metrics: last 24 hours, counts
+last_24 = datetime.utcnow() - timedelta(hours=24)
+recent_count = result_df[result_df['Date'] >= last_24].shape[0]
+resolved_count = sum(1 for v in st.session_state['statuses'].values() if v=="Resolved")
+pending_count = sum(1 for v in st.session_state['statuses'].values() if v=="Pending")
+
+st.metric("Emails last 24h", recent_count)
+st.metric("Resolved", resolved_count)
+st.metric("Pending", pending_count)
